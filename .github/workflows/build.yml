@@ -1,0 +1,24 @@
+name: Build CI
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Build Example
+        run: |
+          mkdir dist
+          g++ -Weffc++ -Wall -Wpedantic -o dist/simple_example -Iinclude src/*.cpp examples/simple_example.cpp
+
+      - name: Test MD5 Output Hash
+        run: |
+          dist/simple_example dist/simple_example
+          md5sum dist/simple_example
