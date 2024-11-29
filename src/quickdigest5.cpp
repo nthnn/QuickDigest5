@@ -113,10 +113,11 @@ void QuickDigest5::update(const uint8_t* inputBuffer, size_t inputLength) {
         if(offset % 64 == 0) {
             std::vector<uint32_t> block(16);
             for(int idx = 0; idx < 16; ++idx)
-                block[idx] = (uint32_t) (this->input[(idx * 4) + 3]) << 24 |
-                    (uint32_t) (this->input[(idx * 4) + 2]) << 16 |
-                    (uint32_t) (this->input[(idx * 4) + 1]) << 8 |
-                    (uint32_t) (this->input[(idx * 4)]);
+                block[(size_t) idx] =
+                    (uint32_t) (this->input[(size_t) (idx * 4) + 3]) << 24 |
+                    (uint32_t) (this->input[(size_t) (idx * 4) + 2]) << 16 |
+                    (uint32_t) (this->input[(size_t) (idx * 4) + 1]) << 8 |
+                    (uint32_t) (this->input[(size_t) (idx * 4)]);
 
             QuickDigest5::step(block);
             offset = 0;
@@ -135,24 +136,25 @@ void QuickDigest5::finalize() {
 
     std::vector<uint32_t> block(16, 0);
     for(int idx = 0; idx < 14; ++idx)
-        block[idx] = (uint32_t) (this->input[(idx * 4) + 3]) << 24 |
-            (uint32_t) (this->input[(idx * 4) + 2]) << 16 |
-            (uint32_t) (this->input[(idx * 4) + 1]) << 8 |
-            (uint32_t) (this->input[(idx * 4)]);
+        block[(size_t) idx] =
+            (uint32_t) (this->input[(size_t) (idx * 4) + 3]) << 24 |
+            (uint32_t) (this->input[(size_t) (idx * 4) + 2]) << 16 |
+            (uint32_t) (this->input[(size_t) (idx * 4) + 1]) << 8 |
+            (uint32_t) (this->input[(size_t) (idx * 4)]);
 
     block[14] = (uint32_t) (this->size * 8);
     block[15] = (uint32_t) ((this->size * 8) >> 32);
     QuickDigest5::step(block);
 
     for(int i = 0; i < 4; ++i) {
-        this->digest[(i * 4) + 0] =
-            (uint8_t) ((this->buffer[i] & 0x000000ff));
-        this->digest[(i * 4) + 1] =
-            (uint8_t) ((this->buffer[i] & 0x0000ff00) >> 8);
-        this->digest[(i * 4) + 2] =
-            (uint8_t) ((this->buffer[i] & 0x00ff0000) >> 16);
-        this->digest[(i * 4) + 3] =
-            (uint8_t) ((this->buffer[i] & 0xff000000) >> 24);
+        this->digest[(size_t) (i * 4) + 0] =
+            (uint8_t) ((this->buffer[(size_t) i] & 0x000000ff));
+        this->digest[(size_t) (i * 4) + 1] =
+            (uint8_t) ((this->buffer[(size_t) i] & 0x0000ff00) >> 8);
+        this->digest[(size_t) (i * 4) + 2] =
+            (uint8_t) ((this->buffer[(size_t) i] & 0x00ff0000) >> 16);
+        this->digest[(size_t) (i * 4) + 3] =
+            (uint8_t) ((this->buffer[(size_t) i] & 0xff000000) >> 24);
     }
 }
 
@@ -188,7 +190,7 @@ std::vector<uint8_t> QuickDigest5::digestFile(const std::string& filepath) {
     std::vector<uint8_t> buffer(4096);
 
     while(file) {
-        file.read(reinterpret_cast<char*>(buffer.data()), buffer.size());
+        file.read(reinterpret_cast<char*>(buffer.data()), (size_t) buffer.size());
 
         std::streamsize bytesRead = file.gcount();
         if(bytesRead > 0)
