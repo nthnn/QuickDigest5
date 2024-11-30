@@ -190,11 +190,11 @@ std::vector<uint8_t> QuickDigest5::digestFile(const std::string& filepath) {
     std::vector<uint8_t> buffer(4096);
 
     while(file) {
-        file.read(reinterpret_cast<char*>(buffer.data()), (size_t) buffer.size());
+        file.read(reinterpret_cast<char*>(buffer.data()), (std::streamsize) buffer.size());
 
         std::streamsize bytesRead = file.gcount();
         if(bytesRead > 0)
-            QuickDigest5.update(buffer.data(), bytesRead);
+            QuickDigest5.update(buffer.data(), (size_t) bytesRead);
     }
 
     QuickDigest5.finalize();
@@ -209,7 +209,7 @@ std::string QuickDigest5::toHash(const std::string& input) {
         ss << std::hex
             << std::setw(2)
             << std::setfill('0')
-            << (int) digest[i];
+            << (int) digest[(size_t) i];
 
     return ss.str();
 }
@@ -222,7 +222,7 @@ std::string QuickDigest5::fileToHash(const std::string& filepath) {
         ss << std::hex
             << std::setw(2)
             << std::setfill('0')
-            << (int) digest[i];
+            << (int) digest[(size_t) i];
 
     return ss.str();
 }
